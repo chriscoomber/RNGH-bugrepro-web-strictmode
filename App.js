@@ -1,19 +1,30 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { StyleSheet, View, Text, Button } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { GestureHandlerRootView, Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 
 export default function App() {
-  return (
-    <React.StrictMode>
-      <GestureHandlerRootView style={{flex: 1}}>
-        <View style={styles.container}>
+  const [state, setState] = useState({});
+  const renderCount = ++(useRef(0).current);
+
+  return <GestureHandlerRootView style={{ flex: 1 }}>
+    <View style={styles.container}>
+      <Button title={`Force rerender (this is render ${renderCount})`} onPress={() => setState({})} />
+
+      <Text>Strict draggable</Text>
+      <React.StrictMode>
+        <View style={{ flex: 1, alignSelf: 'stretch' }}>
           <DragSquare/>
         </View>
-      </GestureHandlerRootView>
-    </React.StrictMode>
-  );
+      </React.StrictMode>
+
+      <Text>Non-strict draggable</Text>
+      <View style={{ flex: 1, alignSelf: 'stretch' }}>
+        <DragSquare/>
+      </View>
+    </View>
+  </GestureHandlerRootView>
 }
 
 function DragSquare() {
@@ -35,8 +46,8 @@ function DragSquare() {
       <Animated.View
         style={[
           {
-            height: 20,
-            width: 20,
+            height: 100,
+            width: 100,
             backgroundColor: 'red',
             borderRadius: 5,
             position: 'absolute',
