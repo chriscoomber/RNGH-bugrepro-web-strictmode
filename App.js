@@ -1,61 +1,55 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import { GestureHandlerRootView, Gesture, GestureDetector } from 'react-native-gesture-handler';
-
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 export default function App() {
-  const [state, setState] = useState({});
-  const renderCount = ++(useRef(0).current);
+  const [renderCounter, setRenderCounter] = useState(1);
 
-  return <GestureHandlerRootView style={{ flex: 1 }}>
+  return (
     <View style={styles.container}>
-      <Button title={`Force rerender (this is render ${renderCount})`} onPress={() => setState({})} />
+      <Button title={`Force rerender (this is render ${renderCounter})`} onPress={() => setRenderCounter(old => old+1)} />
 
-      <Text>Strict draggable</Text>
+      <Text>With strict mode</Text>
       <React.StrictMode>
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
-          <DragSquare/>
+          <DragSquare x={renderCounter * 100} log />
         </View>
       </React.StrictMode>
 
-      <Text>Non-strict draggable</Text>
+      <Text>Without strict mode</Text>
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <DragSquare/>
+        <DragSquare x={renderCounter * 100} />
       </View>
     </View>
-  </GestureHandlerRootView>
+  );
 }
 
-function DragSquare() {
+function DragSquare(props) {
+
   const x = useSharedValue(0);
-  const y = useSharedValue(0);
 
-  const style = useAnimatedStyle(
-    () => ({ left: x.value, top: y.value }),
-    [x, y]
-  );
+  useEffect(() => {
+    x.value = withSpring(props.x);
+  })
 
-  const pan = Gesture.Pan().onUpdate((e) => {
-    x.value = e.translationX;
-    y.value = e.translationY;
-  });
+  const style = useAnimatedStyle(() => {
+    props.log && console.log(x.value);
+    return ({ left: x.value });
+  }, [x]);
 
   return (
-    <GestureDetector gesture={pan}>
-      <Animated.View
-        style={[
-          {
-            height: 100,
-            width: 100,
-            backgroundColor: 'red',
-            borderRadius: 5,
-            position: 'absolute',
-          },
-          style,
-        ]}
+    <Animated.View
+      style={[
+        {
+          height: 100,
+          width: 100,
+          backgroundColor: 'red',
+          borderRadius: 5,
+          position: 'absolute',
+        },
+        style,
+      ]}
       />
-    </GestureDetector>
   );
 }
 
