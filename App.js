@@ -36,10 +36,12 @@ function DragSquare() {
     [x, y]
   );
 
-  const pan = Gesture.Pan().onUpdate((e) => {
-    x.value = e.translationX;
-    y.value = e.translationY;
-  });
+  const pan = Gesture.Pan()
+    .onUpdate((e) => {
+      console.log('onUpdate', e.x, e.y);
+      x.value = e.translationX;
+      y.value = e.translationY;
+    });
 
   return (
     <GestureDetector gesture={pan}>
