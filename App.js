@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, Button, Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 export default function App() {
@@ -9,28 +9,24 @@ export default function App() {
     <View style={styles.container}>
       <Button title={`Force rerender (this is render ${renderCounter})`} onPress={() => setRenderCounter(old => old+1)} />
 
-      <Text>With strict mode</Text>
+      <Text>With strict mode (click square to animate it)</Text>
       <React.StrictMode>
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
-          <DragSquare x={renderCounter * 100} log />
+          <SlidingSquare log />
         </View>
       </React.StrictMode>
 
-      <Text>Without strict mode</Text>
+      <Text>Without strict mode  (click square to animate it)</Text>
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <DragSquare x={renderCounter * 100} />
+        <SlidingSquare />
       </View>
     </View>
   );
 }
 
-function DragSquare(props) {
+function SlidingSquare(props) {
 
   const x = useSharedValue(0);
-
-  useEffect(() => {
-    x.value = withSpring(props.x);
-  })
 
   const style = useAnimatedStyle(() => {
     props.log && console.log(x.value);
@@ -39,17 +35,13 @@ function DragSquare(props) {
 
   return (
     <Animated.View
-      style={[
-        {
-          height: 100,
-          width: 100,
-          backgroundColor: 'red',
-          borderRadius: 5,
-          position: 'absolute',
-        },
-        style,
-      ]}
+      style={style}
+    >
+      <Pressable 
+        onPress={() => { x.value = withSpring(x.value + 100); }}
+        style={{ height: 100, width: 100, backgroundColor: 'red', borderRadius: 5 }}
       />
+    </Animated.View>
   );
 }
 
